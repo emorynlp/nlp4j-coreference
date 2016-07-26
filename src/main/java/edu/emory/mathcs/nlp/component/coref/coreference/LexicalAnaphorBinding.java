@@ -1,9 +1,9 @@
 package coreference;
 
 import nodes.CRNode;
-import utils.CRUtils;
 import utils.Constants;
 import utils.Domain;
+import utils.GrammarUtils;
 
 /**
  * Created by ethzh_000 on 7/6/2016.
@@ -11,7 +11,7 @@ import utils.Domain;
 public class LexicalAnaphorBinding {
 
     public static boolean base(CRNode lex_ana, CRNode np) {
-        return CRUtils.featuresMatch(lex_ana, np);
+        return GrammarUtils.featuresMatch(lex_ana, np);
     }
 
     public static boolean Rule1(CRNode lex_ana, CRNode np) {
@@ -37,18 +37,20 @@ public class LexicalAnaphorBinding {
     // inefficient - needs to be fixed
     public static boolean Rule4(CRNode lex_ana, CRNode np) {
         CRNode np_head = np.getDependencyHead();
-        if (!np_head.getPartOfSpeechTag().substring(0, 2).equals("VB")) return false;
+        String np_pos_tag = np_head.getPartOfSpeechTag();
+        if ( np_pos_tag.length() >= 2 && !np_pos_tag.substring(0, 2).equals("VB")) return false;
 
         CRNode ana_head = lex_ana.getDependencyHead();
         while (!ana_head.getWordForm().equals(Constants.ROOT_TAG)) {
-            if (ana_head.getPartOfSpeechTag().substring(0, 2).equals("NN")) break;
+            String ana_pos_tag = ana_head.getPartOfSpeechTag();
+            if (ana_pos_tag.length() >= 2 && ana_pos_tag.substring(0, 2).equals("NN")) break;
             ana_head = ana_head.getDependencyHead();
         }
 
         if (ana_head.getWordForm().equals(Constants.ROOT_TAG)) return false;
 
         for (CRNode ditem : ana_head.getDependentList())
-            if (CRUtils.isDeterminer(ditem)) return false;
+            if (GrammarUtils.isDeterminer(ditem)) return false;
 
         if (Domain.inArgumentDomain(ana_head, np)) return true;
         if (Domain.inAdjunctDomain(ana_head, np)) return true;
@@ -57,7 +59,7 @@ public class LexicalAnaphorBinding {
     }
 
     public static boolean Rule5(CRNode lex_ana, CRNode np) {
-        if (!CRUtils.isDeterminer(lex_ana)) return false;
+        if (!GrammarUtils.isDeterminer(lex_ana)) return false;
         CRNode ana_head = lex_ana.getDependencyHead();
 
         if (Rule1(ana_head, np)) return true;

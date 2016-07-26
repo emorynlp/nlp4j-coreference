@@ -2,8 +2,8 @@ package nodes;
 
 import java.util.Map;
 
-import utils.Constants;
 import collections.Equivalence;
+import utils.Constants;
 
 import edu.emory.mathcs.nlp.component.template.node.AbstractNLPNode;
 import edu.emory.mathcs.nlp.component.template.node.FeatMap;
@@ -16,6 +16,8 @@ public class CRNode extends AbstractNLPNode<CRNode> {
     private String gender;
     private String number;
     private int person;
+    private int scene;
+    private int utterance;
     private int document;
     private int salient_weight;
     private int ghost_salience;
@@ -67,10 +69,12 @@ public class CRNode extends AbstractNLPNode<CRNode> {
         init();
     }
 
-    public void init() {
+    protected void init() {
         gender = "n";
         number = "sg";
         person = 3;
+        scene = -1;
+        utterance = -1;
         document = -1;
         salient_weight = 0;
         ghost_salience = 0;
@@ -78,7 +82,7 @@ public class CRNode extends AbstractNLPNode<CRNode> {
         equivalence_class = null;
     }
 
-    public void init(String gender, String number, int person, int document) {
+    protected void init(String gender, String number, int person, int document) {
         this.gender = gender;
         this.number = number;
         this.person = person;
@@ -120,6 +124,14 @@ public class CRNode extends AbstractNLPNode<CRNode> {
 
     public void setPerson(int p) {
         person = p;
+    }
+
+    public void setSceneNumber(int scene_num) {
+        scene = scene_num;
+    }
+
+    public void setUtteranceNumber(int utter_num) {
+        utterance = utter_num;
     }
 
     public void setDocumentNumber(int doc_num) {
@@ -212,6 +224,6 @@ public class CRNode extends AbstractNLPNode<CRNode> {
 
     @Override
     public String toString() {
-        return Integer.toString(document) + "\t" + super.toString() + "\t" + Integer.toString(salient_weight);
+        return Integer.toString(scene) + "\t" + Integer.toString(utterance) + "\t" + Integer.toString(document) + "\t" + super.toString() + "\t" + Integer.toString(salient_weight);
     }
 }

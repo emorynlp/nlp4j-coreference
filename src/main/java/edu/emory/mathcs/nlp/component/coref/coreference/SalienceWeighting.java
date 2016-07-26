@@ -3,8 +3,8 @@ package coreference;
 import java.util.ArrayList;
 import java.util.List;
 
-import nodes.CRNode;
 import collections.*;
+import nodes.CRNode;
 import utils.Constants;
 
 /**
@@ -50,7 +50,8 @@ public class SalienceWeighting {
     public static boolean isHeadNoun(CRNode word) {
         CRNode head = word.getDependencyHead();
         while (!head.getWordForm().equals(Constants.ROOT_TAG)) {
-            if (head.getPartOfSpeechTag().substring(0, 2).equals("NN")) return false;
+            String pos_tag = head.getPartOfSpeechTag();
+            if (pos_tag.length() >= 2 && pos_tag.substring(0, 2).equals("NN")) return false;
             head = head.getDependencyHead();
         }
 
@@ -58,7 +59,6 @@ public class SalienceWeighting {
     }
 
     public static void findAllNonAdverbials(List<CRNode> nouns) {
-        List<CRNode> nadv_list = new ArrayList<>();
         boolean adv_phr = true;
 
         for (int i = 0; i < nouns.size(); i++) {
@@ -80,6 +80,7 @@ public class SalienceWeighting {
     }
 
     public static void measureNewSalience(List<CRNode> curr_nouns) {
+        if (curr_nouns.isEmpty()) return;
         findAllNonAdverbials(curr_nouns);
 
         for (CRNode noun : curr_nouns) {

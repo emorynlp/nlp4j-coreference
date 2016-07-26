@@ -25,12 +25,4 @@ public class CRReader extends TSVReader<CRNode> {
     public CRNode create() {
         return new CRNode();
     }
-
-    /* public static void main(String[] args) throws Exception {
-        CRReader r = new CRReader(1, 2, 3, 4, 5, 6, 7, 8);
-
-        r.open(new FileInputStream(new File("C:/Users/ethzh_000/IdeaProjects/Coref_Resolution/src/readers/test.txt.nlp")));
-        System.out.println(r.readDocument().toString());
-        r.close();
-    } */
 }

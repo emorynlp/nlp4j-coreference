@@ -1,8 +1,8 @@
 package coreference;
 
 import nodes.CRNode;
-import utils.CRUtils;
 import utils.Domain;
+import utils.GrammarUtils;
 
 /**
  * Created by ethzh_000 on 7/5/2016.
@@ -10,7 +10,7 @@ import utils.Domain;
 public class Coreferential {
 
     public static boolean Rule1(CRNode prp, CRNode np) {
-        return !CRUtils.featuresMatch(prp, np);
+        return !GrammarUtils.featuresMatch(prp, np);
     }
 
     public static boolean Rule2(CRNode prp, CRNode np) {
@@ -26,7 +26,7 @@ public class Coreferential {
         if (pos_tag.equals("PRP") || pos_tag.equals("PRP$")) return false;
 
         CRNode head = prp.getDependencyHead();
-        if (CRUtils.isContainedIn(np, head)) return true;
+        if (GrammarUtils.isContainedIn(np, head)) return true;
 
         return false;
     }
@@ -36,8 +36,8 @@ public class Coreferential {
     }
 
     public static boolean Rule6(CRNode prp, CRNode np) {
-        if (!CRUtils.isDeterminer(prp)) return false;
-        if (!CRUtils.isContainedIn(np, prp.getDependencyHead())) return false;
+        if (!GrammarUtils.isDeterminer(prp)) return false;
+        if (!GrammarUtils.isContainedIn(np, prp.getDependencyHead())) return false;
 
         return true;
     }

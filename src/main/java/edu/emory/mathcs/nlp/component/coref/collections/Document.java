@@ -1,6 +1,10 @@
 package collections;
 
-import java.util.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.HashMap;
 
 import nodes.CRNode;
 
@@ -12,7 +16,8 @@ public class Document {
     private int document_number = 0;
     private List<CRNode> sentence;
 
-    public Document() { }
+    public Document() {
+    }
 
     public Document(List<CRNode> sentence) {
         this.sentence = sentence;
@@ -22,7 +27,7 @@ public class Document {
         this.sentence = new ArrayList<>(Arrays.asList(sentence));
     }
 
-    public Document(List<CRNode> sentence, int document_number) {
+    public Document(int document_number, List<CRNode> sentence) {
         this.sentence = sentence;
         this.document_number = document_number;
         setNodeDocumentNumber();

@@ -2,9 +2,9 @@ package collections;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.Map;
 
 import nodes.CRNode;
 import utils.Constants;
@@ -92,13 +92,27 @@ public class Equivalence {
 
     public void setAppropriateFactor(String factor) {
         switch (factor) {
-            case "subj": setSubjFactor(); break;
-            case "exist": setExistFactor(); break;
-            case "acc": setAccFactor(); break;
-            case "dat": setDatFactor(); break;
-            case "obliq": setObliqFactor(); break;
-            case "head_nn": setHeadNounFactor(); break;
-            case "non_adv": setNonAdvFactor(); break;
+            case "subj":
+                setSubjFactor();
+                break;
+            case "exist":
+                setExistFactor();
+                break;
+            case "acc":
+                setAccFactor();
+                break;
+            case "dat":
+                setDatFactor();
+                break;
+            case "obliq":
+                setObliqFactor();
+                break;
+            case "head_nn":
+                setHeadNounFactor();
+                break;
+            case "non_adv":
+                setNonAdvFactor();
+                break;
         }
     }
 

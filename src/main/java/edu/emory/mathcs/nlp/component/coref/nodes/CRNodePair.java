@@ -1,8 +1,8 @@
 package nodes;
 
 import utils.CRUtils;
-
-import java.util.Comparator;
+import utils.Constants;
+import utils.GrammarUtils;
 
 /**
  * Created by ethzh_000 on 7/5/2016.
@@ -11,8 +11,6 @@ public class CRNodePair implements Comparable<CRNodePair> {
 
     private CRNode node1;
     private CRNode node2;
-
-    public CRNodePair() { }
 
     public CRNodePair(CRNode node1, CRNode node2) {
         this.node1 = node1;
@@ -37,6 +35,13 @@ public class CRNodePair implements Comparable<CRNodePair> {
 
     public CRNode getSecondNode() {
         return node2;
+    }
+
+    public int getPairSalience() {
+        int ghost_sal = node2.getGhostSalience();
+        if (GrammarUtils.isCataphoric(this)) ghost_sal -= Constants.cat_emph;
+        if (GrammarUtils.areParallel(node1, node2)) ghost_sal += Constants.parallel_emph;
+        return ghost_sal;
     }
 
     // Helpers

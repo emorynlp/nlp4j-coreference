@@ -98,7 +98,13 @@ public class CRNode extends AbstractNLPNode<CRNode>
         init(Gender.NEUTER, GNumber.SINGULAR, GPerson.THIRD);
     }
 
-    protected void init(Gender gender, GNumber number, GPerson person)
+    public CRNode(Gender gender, GNumber number, GPerson person, int id, String form, String lemma, String posTag, String namentTag, String answerTag, FeatMap feats, CRNode dhead, String deprel)
+    {
+        super(id, form, lemma, posTag, namentTag, feats, dhead, deprel);
+        init(gender, number, person);
+    }
+
+    public void init(Gender gender, GNumber number, GPerson person)
     {
     	setGender(gender);
     	setNumber(number);

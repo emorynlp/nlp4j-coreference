@@ -18,11 +18,10 @@ package edu.emory.mathcs.nlp.coreference;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import edu.emory.mathcs.nlp.common.util.DSUtils;
 import edu.emory.mathcs.nlp.common.util.IOUtils;
@@ -30,6 +29,7 @@ import edu.emory.mathcs.nlp.common.util.Splitter;
 import edu.emory.mathcs.nlp.component.template.node.AbstractNLPNode;
 import edu.emory.mathcs.nlp.coreference.collection.CRNode;
 import edu.emory.mathcs.nlp.coreference.util.ENGrammarUtils;
+import edu.emory.mathcs.nlp.coreference.util.CRUtils;
 import edu.emory.mathcs.nlp.coreference.util.type.GNumber;
 import edu.emory.mathcs.nlp.coreference.util.type.GPerson;
 import edu.emory.mathcs.nlp.coreference.util.type.Gender;
@@ -47,21 +47,59 @@ public class MentionDetector implements Serializable
 	
 	public MentionDetector()
 	{
-		m_nouns = DSUtils.createStringHashSet(IOUtils.createFileInputStream("masculine_nouns.txt"));
-		f_nouns = DSUtils.createStringHashSet(IOUtils.createFileInputStream("feminine_nouns.txt"));
+		m_nouns = DSUtils.createStringHashSet(IOUtils.createFileInputStream("C:/Users/ethzh_000/IdeaProjects/nlp4j-coreference/src/main/resources/edu/emory/mathcs/nlp/coreference/masculine_nouns.txt"));
+		f_nouns = DSUtils.createStringHashSet(IOUtils.createFileInputStream("C:/Users/ethzh_000/IdeaProjects/nlp4j-coreference/src/main/resources/edu/emory/mathcs/nlp/coreference/feminine_nouns.txt"));
 		
 		try
 		{
-			m_names = readNameFileSet("male_names.txt");
-			f_names = readNameFileSet("female_names.txt");
+			m_names = readNameFileSet("C:/Users/ethzh_000/IdeaProjects/nlp4j-coreference/src/main/resources/edu/emory/mathcs/nlp/coreference/male_names.txt");
+			f_names = readNameFileSet("C:/Users/ethzh_000/IdeaProjects/nlp4j-coreference/src/main/resources/edu/emory/mathcs/nlp/coreference/female_names.txt");
 		}
 		catch (IOException e) {e.printStackTrace();}
 	}
 	
 	public List<CRNode> getMentions(CRNode[] nodes)
 	{
-		List<CRNode> mentions = Arrays.stream(nodes).filter(ENGrammarUtils::isNominal).collect(Collectors.toList());
-		init(mentions);
+		List<CRNode> mentions = new ArrayList<>();
+		CRNode entity = null;
+		String word_form = null;
+		List<CRNode> compounds = new ArrayList<>();
+
+		for (int i = 0; i < nodes.length; i++) {
+			if (!ENGrammarUtils.isNominal(nodes[i])) continue;
+
+			char bilou = nodes[i].getNamedEntityTag().charAt(0);
+			switch(bilou) {
+				case 'B':
+					word_form = nodes[i].getWordForm();
+					break;
+				case 'I':
+					if (word_form != null) word_form += " " + nodes[i].getWordForm();
+					continue;
+				case 'L':
+					entity = CRUtils.copy(nodes[i]);
+					if (word_form != null) entity.setWordForm(word_form + " " + entity.getWordForm());
+					mentions.add(entity);
+					continue;
+				case 'O':
+					String dlabel = nodes[i].getDependencyLabel();
+					if (dlabel.equals("compound")) compounds.add(nodes[i]);
+					else {
+						entity = CRUtils.copy(nodes[i]);
+						if (compounds.size() > 0) {
+							for (CRNode compound : compounds) entity.setWordForm(compound.getWordForm() + " " + entity.getWordForm());
+							compounds = new ArrayList<>();
+						}
+						mentions.add(entity);
+					}
+					break;
+				case 'U':
+					entity = CRUtils.copy(nodes[i]);
+					mentions.add(entity);
+					break;
+			}
+		}
+
 		return mentions;
 	}
 	

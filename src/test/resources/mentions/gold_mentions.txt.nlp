@@ -1,0 +1,14 @@
+1	His	his	PRP$	_	2	poss	_	O
+2	portrait	portrait	NN	_	5	nsubj	_	O
+3	of	of	IN	_	2	prep	_	O
+4	John	john	NNP	_	3	pobj	_	U-PERSON
+5	was	be	VBD	_	0	root	_	O
+6	as	as	RB	_	7	advmod	_	O
+7	boring	boring	JJ	_	5	acomp	_	O
+8	as	as	IN	_	7	prep	_	O
+9	the	the	DT	_	10	det	_	O
+10	portrait	portrait	NN	_	8	pobj	_	O
+11	of	of	IN	_	10	prep	_	O
+12	Henry	henry	_	_	13	compound	_	B-PERSON
+13	Henry VIII	viii	NNP	_	11	pobj	_	L-PERSON
+14	.	.	.	_	5	punct	_	O

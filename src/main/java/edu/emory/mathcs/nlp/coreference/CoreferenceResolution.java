@@ -34,6 +34,7 @@ import edu.emory.mathcs.nlp.coreference.util.ENGrammarUtils;
 import edu.emory.mathcs.nlp.coreference.util.LLUtils;
 import edu.emory.mathcs.nlp.coreference.util.SalienceConstant;
 import edu.emory.mathcs.nlp.coreference.util.reader.CRReader;
+import edu.emory.mathcs.nlp.coreference.collection.CRNodeIdentifier;
 
 /**
  * @author Ethan Zhou, Jinho D. Choi ({@code jinho.choi@emory.edu})
@@ -43,7 +44,8 @@ public class CoreferenceResolution implements NLPComponent<CRNode>, Serializable
 	private static final long serialVersionUID = 4385016199630276557L;
 	private List<CRNode>       mention_list;
     private Set<CRNode>        discourse_referents;
-    private Map<CRNode,CRNode> all_coreferents;
+    // private Map<CRNode,CRNode> all_coreferents;
+    private Map<CRNodeIdentifier,CRNodeIdentifier> all_coreferents;
     private MentionDetector    mention_detector;
     private SalienceConstant   salience_constant;
     private CRReader           reader;
@@ -74,7 +76,7 @@ public class CoreferenceResolution implements NLPComponent<CRNode>, Serializable
         salience_constant = new SalienceConstant();
     }
 
-    public Map<CRNode, CRNode> getCoreferents() {
+    public Map<CRNodeIdentifier, CRNodeIdentifier> getCoreferents() {
         return all_coreferents;
     }
 
@@ -125,10 +127,18 @@ public class CoreferenceResolution implements NLPComponent<CRNode>, Serializable
 //        // DebugUtils.printFeatures(nonlex_coreferents);
 //        System.out.println();
 
-        Map<CRNode, CRNode> nonlex_map = nonrefl_coreferents.stream().collect(Collectors.toMap(CRNodePair::getFirstNode, CRNodePair::getSecondNode));
+        /* Map<CRNode, CRNode> nonlex_map = nonrefl_coreferents.stream().collect(Collectors.toMap(CRNodePair::getFirstNode, CRNodePair::getSecondNode));
         Map<CRNode, CRNode> lexana_map = refl_coreferents.stream().collect(Collectors.toMap(CRNodePair::getFirstNode, CRNodePair::getSecondNode));
         all_coreferents.putAll(nonlex_map);
-        all_coreferents.putAll(lexana_map);
+        all_coreferents.putAll(lexana_map); */
+
+        Map<CRNodeIdentifier, CRNodeIdentifier> nonref_map = new HashMap<>();
+        Map<CRNodeIdentifier, CRNodeIdentifier> ref_map = new HashMap<>();
+        for (CRNodePair node_pair : nonrefl_coreferents) nonref_map.put(new CRNodeIdentifier(node_pair.getFirstNode()), new CRNodeIdentifier(node_pair.getSecondNode()));
+        for (CRNodePair node_pair : refl_coreferents) ref_map.put(new CRNodeIdentifier(node_pair.getFirstNode()), new CRNodeIdentifier(node_pair.getSecondNode()));
+
+        all_coreferents.putAll(nonref_map);
+        all_coreferents.putAll(ref_map);
     }
 
     public List<CRNodePair> findCombinationPairs(List<CRNode> pronouns, List<CRNode> mentions, boolean reflexive) {

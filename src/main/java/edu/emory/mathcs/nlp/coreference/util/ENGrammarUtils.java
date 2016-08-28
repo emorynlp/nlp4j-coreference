@@ -78,4 +78,12 @@ public class ENGrammarUtils
 		String posTag = node.getPartOfSpeechTag();
 		return posTag.startsWith(POSTagEn.POS_NN) || posTag.startsWith(POSTagEn.POS_PRP) || posTag.startsWith(POSTagEn.POS_WP);
 	}
+
+    public static <Node extends AbstractNLPNode<Node>>boolean isCompound(Node node) {
+        return isNominal(node) || containsCompound(node);
+    }
+
+	public static <Node extends AbstractNLPNode<Node>>boolean containsCompound(Node node) {
+        return node.getDependentList().stream().anyMatch(n -> n.getDependencyLabel().equals("compound"));
+    }
 }

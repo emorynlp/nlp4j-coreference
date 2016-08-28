@@ -20,8 +20,9 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import edu.emory.mathcs.nlp.common.util.DSUtils;
 import edu.emory.mathcs.nlp.common.util.IOUtils;
@@ -29,7 +30,6 @@ import edu.emory.mathcs.nlp.common.util.Splitter;
 import edu.emory.mathcs.nlp.component.template.node.AbstractNLPNode;
 import edu.emory.mathcs.nlp.coreference.collection.CRNode;
 import edu.emory.mathcs.nlp.coreference.util.ENGrammarUtils;
-import edu.emory.mathcs.nlp.coreference.util.CRUtils;
 import edu.emory.mathcs.nlp.coreference.util.type.GNumber;
 import edu.emory.mathcs.nlp.coreference.util.type.GPerson;
 import edu.emory.mathcs.nlp.coreference.util.type.Gender;
@@ -57,8 +57,12 @@ public class MentionDetector implements Serializable
 		}
 		catch (IOException e) {e.printStackTrace();}
 	}
+
+	public List<CRNode> getMentions(CRNode[] nodes) {
+		return Arrays.stream(nodes).filter(ENGrammarUtils::isCompound).collect(Collectors.toList());
+	}
 	
-	public List<CRNode> getMentions(CRNode[] nodes)
+	/* public List<CRNode> getMentions(CRNode[] nodes)
 	{
 		List<CRNode> mentions = new ArrayList<>();
 		CRNode entity = null;
@@ -101,7 +105,7 @@ public class MentionDetector implements Serializable
 		}
 
 		return mentions;
-	}
+	} */
 	
 	public Set<String> readNameFileSet(String filename) throws IOException
 	{

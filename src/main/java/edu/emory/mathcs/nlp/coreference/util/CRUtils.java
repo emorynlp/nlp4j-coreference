@@ -75,6 +75,14 @@ public class CRUtils {
         return copy;
     }
 
+    public static int hash(CRNode node) {
+        int hash = node.getSentenceID();
+        hash = ((hash >>> 16) ^ hash) * 0x45d9f3b;
+        hash = ((hash >>> 16) ^ hash) * 0x45d9f3b;
+        hash = (hash >>> 16) ^ hash;
+        return hash;
+    }
+
     public static Set<String> determinerTagSet() {
         Set<String> dset = new HashSet<>();
         dset.add("PRP$");

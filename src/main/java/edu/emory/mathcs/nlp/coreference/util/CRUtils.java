@@ -15,21 +15,16 @@
  */
 package edu.emory.mathcs.nlp.coreference.util;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import edu.emory.mathcs.nlp.common.util.IOUtils;
 import edu.emory.mathcs.nlp.common.util.MathUtils;
+import edu.emory.mathcs.nlp.common.util.Splitter;
 import edu.emory.mathcs.nlp.coreference.collection.CRNode;
 import edu.emory.mathcs.nlp.coreference.collection.CRNodePair;
+import edu.emory.mathcs.nlp.coreference.util.reader.CRReader;
 
 /**
  * @author Ethan Zhou, Jinho D. Choi ({@code jinho.choi@emory.edu})
@@ -51,7 +46,7 @@ public class CRUtils {
         }
     }
 
-    public static CRNodePair max(List<CRNodePair> pairs, SalienceConstant c)
+    /* public static CRNodePair max(List<CRNodePair> pairs, SalienceConstant c)
     {
         return Collections.max(pairs, new Comparator<CRNodePair>()
 		{
@@ -61,6 +56,31 @@ public class CRUtils {
 				return MathUtils.signum(pair1.getPairSalienceWeight(c) - pair2.getPairSalienceWeight(c));
 			}
 		});
+    } */
+
+    public static CRNodePair max(List<CRNodePair> pairs, SalienceConstant c)
+    {
+        return Collections.max(pairs, (CRNodePair pair1, CRNodePair pair2) -> MathUtils.signum(pair1.getPairSalienceWeight(c) - pair2.getPairSalienceWeight(c)));
+    }
+
+    public static CRNode copy(CRNode node) {
+        CRNode copy = new CRNode();
+        copy.set(node.getID(), node.getWordForm(), node.getLemma(), node.getPartOfSpeechTag(), node.getNamedEntityTag(), node.getFeatMap(), node.getDependencyHead(), node.getDependencyLabel());
+        copy.setSentenceID(node.getSentenceID());
+        copy.init(node.getGender(), node.getNumber(), node.getPerson());
+        copy.setSalienceFactor(node.getSalienceFactor());
+        copy.setDynamicSalienceWeight(node.getDynamicSalienceWeight());
+        copy.setStaticSalienceWeight(node.getStaticSalienceWeight());
+
+        return copy;
+    }
+
+    public static int hash(CRNode node) {
+        int hash = node.getSentenceID();
+        hash = ((hash >>> 16) ^ hash) * 0x45d9f3b;
+        hash = ((hash >>> 16) ^ hash) * 0x45d9f3b;
+        hash = (hash >>> 16) ^ hash;
+        return hash;
     }
 
     public static Set<String> determinerTagSet() {
@@ -73,17 +93,43 @@ public class CRUtils {
         return dset;
     }
 
-    public static <K, V> void writeMapToFile(String filename, Map<K, V> map) throws IOException {
+    public static <K, V> void writeMapToFile(Map<K, V> map, String filename) throws IOException {
         File outputFile = new File(filename);
         if (!outputFile.exists()) outputFile.createNewFile();
 
         BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile));
         for (Map.Entry<K, V> entry : map.entrySet())
-            writer.write(entry.getKey() + "\t--------->\t" + entry.getValue().toString() + "\n");
+            writer.write(entry.getKey().toString() + "\t:\t" + entry.getValue().toString() + "\n");
 
         writer.close();
     }
 
+    public static Map<CRNode, CRNode> readFiletoMap(String filename) throws IOException {
+        Map<CRNode, CRNode> map = new HashMap<>();
+        BufferedReader reader = IOUtils.createBufferedReader(filename);
+        List<String[]> node_primitives = new ArrayList<>();
+        CRReader creader = new CRReader(3, 4, 5, 6, 7, 8, 9, 10);
+
+        String line;
+        while ((line = reader.readLine()) != null) {
+            String[] node_pair = line.split("\t:\t");
+            String[] fnode_values = Splitter.splitTabs(node_pair[0]);
+            String[] snode_values = Splitter.splitTabs(node_pair[1]);
+            node_primitives.add(fnode_values);
+            node_primitives.add(snode_values);
+        }
+
+        CRNode[] nodes = creader.toNodeList(node_primitives);
+        for (int i = 0; i < nodes.length; i += 2) {
+            map.put(nodes[i], nodes[i + 1]);
+        }
+
+        return map;
+    }
+
+    public static List<CRNode> filterNouns(List<CRNode> sentence) {
+        return sentence.stream().filter(ENGrammarUtils::isNominal).collect(Collectors.toList());
+    }
 
 //    public static Set<String> definiteDeterminers() throws IOException {
 //        return readTextFileSet(Constants.proj_path + "utils/files/def_det.txt");
@@ -92,11 +138,7 @@ public class CRUtils {
 //    public static Set<String> indefiniteDeterminers() throws IOException {
 //        return readTextFileSet(Constants.proj_path + "utils/files/indef_det.txt");
 //    }
-
-    public static List<CRNode> filterNouns(List<CRNode> sentence) {
-        return sentence.stream().filter(ENGrammarUtils::isNominal).collect(Collectors.toList());
-    }
-
+//
 //    public static List<CRNode> filterDefiniteNouns(List<CRNode> nouns) throws IOException {
 //        List<CRNode> def_list = new ArrayList<>();
 //        for (CRNode noun : nouns)

@@ -47,6 +47,7 @@ public class SalienceFactor implements Serializable
 	
 	public void init(double subject, double existential, double accusative, double dative, double oblique, double headNoun, double nonAdverbial)
 	{
+		weights = new double[7];
 		setSubject(subject);
 		setExistential(existential);
 		setAccusative(accusative);
@@ -60,7 +61,7 @@ public class SalienceFactor implements Serializable
 	
 	public double getSubject()
 	{
-		return IDX_SUBJECT;
+		return weights[IDX_SUBJECT];
 	}
 	
 	public double getExistential()
@@ -133,6 +134,11 @@ public class SalienceFactor implements Serializable
 	public void set(SalienceFactor sf)
 	{
 		System.arraycopy(sf.weights, 0, weights, 0, weights.length);
+	}
+
+	public void union(SalienceFactor sf) {
+		for (int i = 0; i < weights.length; i++)
+			if (weights[i] == 0.0) weights[i] = sf.weights[i];
 	}
 	
 //	============================== Helpers ==============================

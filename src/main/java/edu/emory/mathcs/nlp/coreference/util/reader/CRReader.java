@@ -17,6 +17,10 @@ public class CRReader extends TSVReader<CRNode> {
         super(map);
     }
 
+    public static CRReader DEFAULT() {
+        return new CRReader(1, 2, 3, 4, 5, 6, 7, 8);
+    }
+
     public CRReader(int form, int lemma, int pos, int feats, int dhead, int deprel, int sheads, int nament) {
         super(form, lemma, pos, feats, dhead, deprel, sheads, nament);
     }

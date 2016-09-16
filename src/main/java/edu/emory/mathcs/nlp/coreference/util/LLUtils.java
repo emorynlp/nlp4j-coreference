@@ -93,7 +93,7 @@ public class LLUtils
 
 	public static boolean isNonCoreferential(CRNode P, CRNode N)
 	{
-		return isNonCoreferential1(P, N) || 
+		return isNonCoreferential1(P, N) ||
 			   isNonCoreferential2(P, N) ||
 			   isNonCoreferential3(P, N) || 
 			   isNonCoreferential4(P, N) ||
@@ -103,7 +103,7 @@ public class LLUtils
 	
 	private static boolean isNonCoreferential1(CRNode P, CRNode N)
 	{
-	    return P.agree(N);
+	    return !P.agree(N);
 	}
 
 	private static boolean isNonCoreferential2(CRNode P, CRNode N)

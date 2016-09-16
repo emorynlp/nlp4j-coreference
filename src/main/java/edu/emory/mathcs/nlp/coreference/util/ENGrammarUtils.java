@@ -41,7 +41,7 @@ public class ENGrammarUtils
     }
     
     // TODO: unable to filter "other" as in "each [other]" - needs to be fixed
-    public static boolean isReflexive(CRNode np)
+    public static <Node extends  AbstractNLPNode<Node>>boolean isReflexive(Node np)
     {
         String lemma = np.getLemma();
         return lemma.endsWith("self") || lemma.endsWith("selves");
@@ -78,4 +78,16 @@ public class ENGrammarUtils
 		String posTag = node.getPartOfSpeechTag();
 		return posTag.startsWith(POSTagEn.POS_NN) || posTag.startsWith(POSTagEn.POS_PRP) || posTag.startsWith(POSTagEn.POS_WP);
 	}
+
+    public static <Node extends AbstractNLPNode<Node>>boolean isMention(Node node) {
+        return (isNominal(node) && !node.getDependencyLabel().equals("compound")) || containsCompound(node);
+    }
+
+	public static <Node extends AbstractNLPNode<Node>>boolean containsCompound(Node node) {
+        return node.getDependentList().stream().anyMatch(n -> n.getDependencyLabel().equals("compound"));
+    }
+
+    public static boolean isCataphoric(CRNode node1, CRNode node2) {
+        return (node1.getSentenceID() >= node2.getSentenceID()) && (node1.getID() > node2.getID());
+    }
 }

@@ -15,10 +15,13 @@
  */
 package edu.emory.mathcs.nlp.coreference.collection;
 
+import java.util.List;
 import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 import edu.emory.mathcs.nlp.component.template.node.AbstractNLPNode;
 import edu.emory.mathcs.nlp.component.template.node.FeatMap;
+import edu.emory.mathcs.nlp.coreference.util.ENGrammarUtils;
 import edu.emory.mathcs.nlp.coreference.util.SalienceFactor;
 import edu.emory.mathcs.nlp.coreference.util.type.GNumber;
 import edu.emory.mathcs.nlp.coreference.util.type.GPerson;
@@ -98,7 +101,13 @@ public class CRNode extends AbstractNLPNode<CRNode>
         init(Gender.NEUTER, GNumber.SINGULAR, GPerson.THIRD);
     }
 
-    protected void init(Gender gender, GNumber number, GPerson person)
+    public CRNode(Gender gender, GNumber number, GPerson person, int id, String form, String lemma, String posTag, String namentTag, String answerTag, FeatMap feats, CRNode dhead, String deprel)
+    {
+        super(id, form, lemma, posTag, namentTag, feats, dhead, deprel);
+        init(gender, number, person);
+    }
+
+    public void init(Gender gender, GNumber number, GPerson person)
     {
     	setGender(gender);
     	setNumber(number);
@@ -127,7 +136,7 @@ public class CRNode extends AbstractNLPNode<CRNode>
     // TODO: make sure if static is necessary
     public void setSalienceWeight(double weight)
     {
-    	setSalienceWeight(weight);
+    	setStaticSalienceWeight(weight);
     	setDynamicSalienceWeight(weight);
     }
 
@@ -234,6 +243,14 @@ public class CRNode extends AbstractNLPNode<CRNode>
     {
         return salience_factor;
     }
+
+    public boolean isCompound() {
+        return ENGrammarUtils.containsCompound(this);
+    }
+
+    public List<CRNode> getCompounds() {
+        return this.getDependentList().stream().filter(dep -> dep.getDependencyLabel().equals("compound")).collect(Collectors.toList());
+    }
     
 //	============================== Helpers ==============================
 
@@ -277,6 +294,9 @@ public class CRNode extends AbstractNLPNode<CRNode>
     	join.add(Integer.toString(scene_id));
     	join.add(Integer.toString(utterance_id));
     	join.add(Integer.toString(sentence_id));
+        join.add(gender.toString());
+        join.add(person.toString());
+        join.add(number.toString());
     	join.add(super.toString());
     	join.add(Double.toString(static_salient_weight));
 

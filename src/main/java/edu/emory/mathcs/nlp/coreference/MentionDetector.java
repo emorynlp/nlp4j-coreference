@@ -18,9 +18,9 @@ package edu.emory.mathcs.nlp.coreference;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -47,20 +47,19 @@ public class MentionDetector implements Serializable
 	
 	public MentionDetector()
 	{
-		m_nouns = DSUtils.createStringHashSet(IOUtils.createFileInputStream("masculine_nouns.txt"));
-		f_nouns = DSUtils.createStringHashSet(IOUtils.createFileInputStream("feminine_nouns.txt"));
+		m_nouns = DSUtils.createStringHashSet(IOUtils.createFileInputStream("C:/Users/ethzh_000/IdeaProjects/nlp4j-coreference/src/main/resources/edu/emory/mathcs/nlp/coreference/masculine_nouns.txt"));
+		f_nouns = DSUtils.createStringHashSet(IOUtils.createFileInputStream("C:/Users/ethzh_000/IdeaProjects/nlp4j-coreference/src/main/resources/edu/emory/mathcs/nlp/coreference/feminine_nouns.txt"));
 		
 		try
 		{
-			m_names = readNameFileSet("male_names.txt");
-			f_names = readNameFileSet("female_names.txt");
+			m_names = readNameFileSet("C:/Users/ethzh_000/IdeaProjects/nlp4j-coreference/src/main/resources/edu/emory/mathcs/nlp/coreference/male_names.txt");
+			f_names = readNameFileSet("C:/Users/ethzh_000/IdeaProjects/nlp4j-coreference/src/main/resources/edu/emory/mathcs/nlp/coreference/female_names.txt");
 		}
 		catch (IOException e) {e.printStackTrace();}
 	}
-	
-	public List<CRNode> getMentions(CRNode[] nodes)
-	{
-		List<CRNode> mentions = Arrays.stream(nodes).filter(ENGrammarUtils::isNominal).collect(Collectors.toList());
+
+	public List<CRNode> getMentions(CRNode[] nodes) {
+		List<CRNode> mentions = Arrays.stream(nodes).filter(ENGrammarUtils::isMention).collect(Collectors.toList());
 		init(mentions);
 		return mentions;
 	}
@@ -88,18 +87,26 @@ public class MentionDetector implements Serializable
 	        String lemma = node.getLemma();
 	        if (ENGrammarUtils.isPlural(node)) node.setNumber(GNumber.PLURAL);
 	        
-	        if      (isMale(node))   node.setGender(Gender.MALE);
-	        else if (isFemale(node)) node.setGender(Gender.FEMALE);
+	        if      (isMasculine(node))   node.setGender(Gender.MALE);
+	        else if (isFeminine(node)) node.setGender(Gender.FEMALE);
 	
 	        if      (ENGrammarUtils.FIRST_PERSON_PRONOUN_SET.contains(lemma))  node.setPerson(GPerson.FIRST);
 	        else if (ENGrammarUtils.SECOND_PERSON_PRONOUN_SET.contains(lemma)) node.setPerson(GPerson.SECOND);
 	        else if (ENGrammarUtils.THIRD_PERSON_PRONOUN_SET.contains(lemma))  node.setPerson(GPerson.THIRD);
 	    }
 	}
+
+	public <Node extends AbstractNLPNode<Node>>boolean isMasculine(Node node) {
+		return isMale(node) || node.getDependentList().stream().filter(n -> n.getDependencyLabel().equals("compound") && n.getDependencyHead() == node).anyMatch(dep -> isMale(dep));
+	}
+
+	public <Node extends AbstractNLPNode<Node>>boolean isFeminine(Node node) {
+		return isFemale(node) || node.getDependentList().stream().filter(n -> n.getDependencyLabel().equals("compound") && n.getDependencyHead() == node).anyMatch(dep -> isFemale(dep));
+	}
 	
 	public <Node extends AbstractNLPNode<Node>>boolean isMale(Node node)
     {
-    	return m_nouns.contains(node.getLemma()) || m_names.contains(node.getWordForm());	
+    	return m_nouns.contains(node.getLemma()) || m_names.contains(node.getWordForm());
     }
 	
 	public <Node extends AbstractNLPNode<Node>>boolean isFemale(Node node)

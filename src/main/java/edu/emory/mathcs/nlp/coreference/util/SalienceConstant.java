@@ -31,11 +31,11 @@ public class SalienceConstant extends SalienceFactor
 		this(100, 35, 175, 80, 70, 50, 40, 40, 80, 50, 0.5);
 	}
 	
-	public SalienceConstant(double sentenceRecency, double paralle, double cataphora, double subject, double existential, double accusative, double dative, double oblique, double headNoun, double nonAdverbial, double degrade)
+	public SalienceConstant(double sentenceRecency, double parallel, double cataphora, double subject, double existential, double accusative, double dative, double oblique, double headNoun, double nonAdverbial, double degrade)
 	{
 		super(subject, existential, accusative, dative, oblique, headNoun, nonAdverbial);
 		setSentenceRecency(sentenceRecency);
-		setParallel(paralle);
+		setParallel(parallel);
 		setCataphora(cataphora);
 		setDegrade(degrade);
 	}

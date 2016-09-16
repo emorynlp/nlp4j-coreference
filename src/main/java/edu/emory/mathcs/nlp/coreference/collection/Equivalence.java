@@ -44,10 +44,10 @@ public class Equivalence implements Serializable
 
     public Equivalence(CRNode antecedent, List<CRNode> referents)
     {
+        setSalienceFactor(new SalienceFactor());
     	setAntecedent(antecedent);
     	setReferentList(referents);
         addReferent(antecedent);
-        setSalienceFactor(new SalienceFactor());
     }
 
 //	============================== Setters ==============================
@@ -71,7 +71,7 @@ public class Equivalence implements Serializable
     {
         referent_list.add(ref);
         ref.setEquivalenceClass(this);
-        salience_factor.set(ref.getSalienceFactor());
+        salience_factor.union(ref.getSalienceFactor());
     }
 
 //	============================== Getters ==============================
